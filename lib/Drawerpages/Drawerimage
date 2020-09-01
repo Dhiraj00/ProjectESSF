@@ -1,0 +1,56 @@
+ import 'dart:io';
+
+import 'package:essf/Homepage.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+ 
+ 
+ 
+ 
+class Drawerextends HomePage{ 
+ 
+
+Future<void> showPickOptionsDialog(BuildContext context) async {
+      return Platform.isIOS
+          ? await showCupertinoDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                      content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      ListTile(
+                        onTap: () {
+                          getImage(ImageSource.gallery);
+                        },
+                        title: Text('Pick image from your gallery'),
+                      ),
+                      ListTile(
+                        onTap: () {
+                          getImage(ImageSource.camera);
+                        },
+                        title: Text('Capture photo'),
+                      )
+                    ],
+                  )))
+          : await showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                      content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      InkWell(
+                        onTap: () {
+                          getImage(ImageSource.gallery);
+                        },
+                        child: Text('Pick image from your gallery'),
+                      ),
+                      ListTile(
+                        onTap: () {
+                          getImage(ImageSource.camera);
+                        },
+                        title: Text('Capture photo'),
+                      )
+                    ],
+                  )));
+    }}

@@ -15,12 +15,10 @@ class LandingPage extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.active) {
             User user = snapshot.data;
             if (user == null) {
-              return LogInPage(
-                auth: auth,
-              );
+              return LogInPage();
             }
             return HomePage(
-              auth: auth,
+              auth: Auth(),
             );
           } else {
             return Scaffold(

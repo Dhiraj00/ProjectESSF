@@ -1,11 +1,13 @@
+
+import 'package:essf/Platformecxception.dart';
 import 'package:essf/RegisterPage.dart';
+import 'package:essf/adminscreens/AdminsignInpage.dart';
 import 'package:essf/auth.dart';
 import 'package:essf/forgot_password.dart';
-import 'package:essf/platform_alert.dart';
 
 import 'package:flutter/material.dart';
-
-enum LogInPageFormType { signIn }
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class LogInPage extends StatefulWidget {
   LogInPage({this.auth});
@@ -26,47 +28,57 @@ class _LogInPageState extends State<LogInPage> {
     @required this.auth,
   });
 
-  final AuthBase auth;
+  AuthBase auth;
+  @override
+  void initState() {
+    auth = Auth();
+
+    super.initState();
+  }
+
+  void dispose() {
+    super.dispose();
+   _emailController.clear();
+   _passwordController.clear();
+  }
 
   final scaffoldKey = new GlobalKey<ScaffoldState>();
   final _formkey = new GlobalKey<FormState>();
+  void _showSignInError(BuildContext context, PlatformException exception) {
+    PlatformExceptionAlertDialog(
+      title: 'Sign In Failed',
+      exception: exception,
+    ).show(context);
+  }
 
-  Future<void> _signInwithGoogle() async {
+  Future<void> _signInwithGoogle(BuildContext context) async {
     try {
-      await auth.signInwithGoogle();
-    } catch (e) {
-      PlatformAlertDialog(
-              title: 'Error',
-              content: e.toString(),
-              cancelActionText: null,
-              defaultActionText: 'ok')
-          .show(context);
+      await auth.signInwithGoogle(context);
+    } on PlatformException catch (e) {
+      if (e.code != 'ERROR_ABORTED_BY_USER') {
+        _showSignInError(context, e);
+      }
     }
   }
 
-  Future<void> _signInwithFacebook() async {
+  Future<void> _signInwithFacebook(BuildContext context) async {
     try {
-      await auth.signInWithFacebook();
-    } catch (e) {
-      PlatformAlertDialog(
-              title: 'Error',
-              content: e.toString(),
-              cancelActionText: null,
-              defaultActionText: 'ok')
-          .show(context);
+      await auth.signInWithFacebook(context);
+    } on PlatformException catch (e) {
+      if (e.code != 'ERROR_ABORTED_BY_USER') {
+        _showSignInError(context, e);
+      }
     }
   }
 
-  Future<void> _signInWithEmailAndPassword() async {
+  Future<void> _signInWithEmailAndPassword(BuildContext context) async {
     try {
-      await auth.signInWithEmailAndPassword(_email, _password);
-    } catch (e) {
-      PlatformAlertDialog(
-        title: 'Sign IN Failed',
-        content: e.toString(),
-        defaultActionText: 'OK',
-        cancelActionText: null,
-      ).show(context);
+      if (_formkey.currentState.validate()) _formkey.currentState.save();
+      await auth.signInWithEmailAndPassword(context, _email, _password);
+    } on PlatformException catch (e) {
+      if (e.code != 'ERROR_ABORTED_BY_USER') {
+        _showSignInError(context, e);
+      }
     }
   }
 
@@ -91,11 +103,7 @@ class _LogInPageState extends State<LogInPage> {
       maxLines: 2,
       textDirection: TextDirection.ltr,
       textAlign: TextAlign.center,
-      style: TextStyle(
-        color: Colors.yellow,
-        fontWeight: FontWeight.w900,
-        fontSize: 40,
-      ),
+      style: GoogleFonts.arbutus(fontSize: 27.0, color: Colors.yellowAccent),
     );
   }
 
@@ -156,19 +164,23 @@ class _LogInPageState extends State<LogInPage> {
                         )),
                     keyboardType: TextInputType.emailAddress,
                     obscureText: true,
-                    onEditingComplete: _signInWithEmailAndPassword,
+                    onEditingComplete: () async {
+                      _signInWithEmailAndPassword(context);
+                    },
                     textInputAction: TextInputAction.done,
                   ),
                   new Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: <Widget>[
                         MaterialButton(
-                            onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ForgotScreen()),
-                              );
+                            onPressed: () async {
+                              setState(() {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ForgotScreen()),
+                                );
+                              });
                             },
                             child: Text("Forgot Password ?")),
                       ]),
@@ -176,7 +188,9 @@ class _LogInPageState extends State<LogInPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         FlatButton(
-                          onPressed: _signInWithEmailAndPassword,
+                          onPressed: () async {
+                            await _signInWithEmailAndPassword(context);
+                          },
                           child: Text("LogIn"),
                           color: Colors.blueGrey,
                           padding: EdgeInsets.only(
@@ -189,8 +203,8 @@ class _LogInPageState extends State<LogInPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         FlatButton(
-                          onPressed: () {
-                            Navigator.pushReplacement(
+                          onPressed: () async {
+                            Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => RegisterPage()),
@@ -204,6 +218,26 @@ class _LogInPageState extends State<LogInPage> {
                               borderRadius: BorderRadius.circular(5)),
                         )
                       ]),
+                  SizedBox(height: 10.0),
+                  new Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text('Adminstrator =>  ',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w400)),
+                      RaisedButton(
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Admin()));
+                          },
+                          child: Text('Login Here'),
+                          color: Colors.brown[300])
+                    ],
+                  ),
+                  SizedBox(height: 10.0),
                   new Column(
                     children: <Widget>[
                       Text(
@@ -224,7 +258,9 @@ class _LogInPageState extends State<LogInPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         new FlatButton(
-                            onPressed: _signInwithFacebook,
+                            onPressed: () async {
+                              _signInwithFacebook(context);
+                            },
                             child: Container(
                               height: 40.0,
                               width: 40.0,
@@ -245,7 +281,9 @@ class _LogInPageState extends State<LogInPage> {
                                   )),
                             )),
                         new FlatButton(
-                            onPressed: _signInwithGoogle,
+                            onPressed: () async {
+                              _signInwithGoogle(context);
+                            },
                             child: Container(
                               height: 40.0,
                               width: 40.0,

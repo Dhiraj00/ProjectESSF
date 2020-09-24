@@ -1,15 +1,24 @@
 import 'dart:io';
 import 'package:essf/Drawerpages/Customlisttile.dart';
 import 'package:essf/Drawerpages/services.dart';
+
+
 import 'package:essf/News/news.dart';
+
 import 'package:essf/auth.dart';
 import 'package:essf/emergency/emergencypage.dart';
 import 'package:essf/maps/Servicesnearme.dart';
 import 'package:essf/models/articlemodel.dart';
+import 'package:essf/platform_alert.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({@required this.auth});
@@ -17,23 +26,27 @@ class HomePage extends StatefulWidget {
   final AuthBase auth;
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _HomePageState createState() => _HomePageState(auth: auth);
 }
 
 class _HomePageState extends State<HomePage> {
+  _HomePageState({@required this.auth});
   List<ArticleModel> articles = new List<ArticleModel>();
   List<Services> services = Services.serviceItems();
-  List<DropdownMenuItem<Services>> _dropdownMenuItems;
+  
   bool _loading;
+  
+  AuthBase auth;
 
   @override
   void initState() {
     _loading = true;
-    _dropdownMenuItems = buildDropdownMenuItems(services);
+    //_dropdownMenuItems = buildDropdownMenuItems(services);
 
     super.initState();
-
     _loadCurrentUser();
+    _email();
+
     getNews();
   }
 
@@ -41,21 +54,26 @@ class _HomePageState extends State<HomePage> {
     News newsClass = News();
     await newsClass.getNews();
     articles = newsClass.news;
-    setState(() {
-      _loading = false;
-    });
+    if (this.mounted) {
+      setState(() {
+        _loading = false;
+      });
+    }
   }
 
-  List<DropdownMenuItem<Services>> buildDropdownMenuItems(List companies) {
+  List<DropdownMenuItem<Services>> buildDropdownMenuItems(List companies,BuildContext context ) {
     List<DropdownMenuItem<Services>> items = List();
     for (Services category in services) {
       items.add(
         DropdownMenuItem(
           value: category,
-          child: Text(
-            category.services,
-            style: TextStyle(fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
+          child: GestureDetector(
+            onTap: () => category.onPressed(context),
+            child: Text(
+              category.services,
+              style: TextStyle(fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
           ),
         ),
       );
@@ -63,8 +81,10 @@ class _HomePageState extends State<HomePage> {
     return items;
   }
 
-  onChangeDropdownItem(Services selectedServices) {
-    setState(() {});
+  onChangeDropdownItem() {
+    setState(() {
+     
+    });
   }
 
   File _image;
@@ -80,7 +100,6 @@ class _HomePageState extends State<HomePage> {
   void _loadCurrentUser() {
     FirebaseAuth.instance.currentUser().then((FirebaseUser user) {
       setState(() {
-        // call setState to rebuild the view
         this.currentUser = user;
       });
     });
@@ -94,22 +113,36 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> _signOut() async {
+  Future<void> _signOut(BuildContext context) async {
     try {
       await widget.auth.signout();
-    } catch (e) {
-      print(e.toString());
+     
+    } on PlatformException catch (e) {
+      return print(e.toString());
+    }
+  }
+
+  Future<void> _confirmSignOut(BuildContext context, {listen = false}) async {
+    final didRequestSignOut = await PlatformAlertDialog(
+      title: 'logout',
+      content: 'Are you sure that you want to logout?',
+      defaultActionText: 'Logout',
+      cancelActionText: 'Cancel',
+    ).show(context);
+    if (didRequestSignOut != false) {
+      _signOut(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    
     Future getImage(ImageSource source, {BuildContext context}) async {
       try {
         final pickedFile = await picker.getImage(source: source);
         if (pickedFile != null) {
           setState(() {
-            _image = pickedFile as File;
+            _image = File(pickedFile.path);
 
             print('Image path $_image');
           });
@@ -120,7 +153,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     Future<void> _showPickOptionsDialog(BuildContext context) async {
-      return Platform.isIOS
+      return (Platform.isIOS != false)
           ? await showCupertinoDialog(
               context: context,
               builder: (context) => AlertDialog(
@@ -128,14 +161,16 @@ class _HomePageState extends State<HomePage> {
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       ListTile(
-                        onTap: () {
-                          getImage(ImageSource.gallery);
+                        onTap: () async {
+                          await getImage(ImageSource.gallery);
+                          Navigator.pop(context);
                         },
                         title: Text('Pick image from your gallery'),
                       ),
                       ListTile(
-                        onTap: () {
-                          getImage(ImageSource.camera);
+                        onTap: () async {
+                          await getImage(ImageSource.camera);
+                          Navigator.pop(context);
                         },
                         title: Text('Capture photo'),
                       )
@@ -148,14 +183,14 @@ class _HomePageState extends State<HomePage> {
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       InkWell(
-                        onTap: () {
-                          getImage(ImageSource.gallery);
+                        onTap: () async {
+                          await getImage(ImageSource.gallery);
                         },
                         child: Text('Pick image from your gallery'),
                       ),
                       ListTile(
-                        onTap: () {
-                          getImage(ImageSource.camera);
+                        onTap: () async {
+                          await getImage(ImageSource.camera);
                         },
                         title: Text('Capture photo'),
                       )
@@ -163,30 +198,36 @@ class _HomePageState extends State<HomePage> {
                   )));
     }
 
+    void _launchUrl(url) async {
+      url = "https://givemeshelterenterprise.org/";
+      if (await canLaunch(url)) {
+        await launch(url);
+      } else {
+        throw 'could not launch $url';
+      }
+    }
+
     return Scaffold(
         appBar: AppBar(
             title: new Center(
                 child: new Text(
               'ESSF',
-              style: TextStyle(
-                fontSize: 20.0,
-                color: Colors.yellow,
-              ),
+              style: GoogleFonts.arbutus(
+                  fontSize: 27.0, color: Colors.yellowAccent),
               textAlign: TextAlign.end,
             )),
             backgroundColor: Colors.blueAccent,
             elevation: 0.0,
             actions: <Widget>[
               IconButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
+                onPressed: () async {
+                  await Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => ServicesNearMe()));
                 },
                 icon: Icon(Icons.near_me),
               ),
-             
             ]),
         drawer: Drawer(
             child: ListView(
@@ -207,7 +248,7 @@ class _HomePageState extends State<HomePage> {
                               height: 100.0,
                               child: _image == null
                                   ? Image.asset("assets/Givemeshelter.png")
-                                  : Image.file(_image),
+                                  : Image.file(_image, fit: BoxFit.fill),
                             ),
                           ),
                         ),
@@ -216,7 +257,9 @@ class _HomePageState extends State<HomePage> {
                         padding: const EdgeInsets.only(left: 160, top: 60),
                         child: FlatButton(
                           onPressed: () {
-                            _showPickOptionsDialog(context);
+                            setState(() {
+                              _showPickOptionsDialog(context);
+                            });
                           },
                           child: Icon(Icons.add_a_photo),
                         ),
@@ -246,37 +289,56 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             SizedBox(height: 15.0),
-            CustomListTile(icon: Icons.home, text: 'Home', onTap: () => {}),
+            CustomListTile(
+                icon: Icons.home,
+                text: 'Home',
+                onTap: () async {
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => HomePage(
+                                auth: Auth(),
+                              )));
+                }),
             SizedBox(height: 15.0),
             CustomListTile(
                 icon: Icons.near_me,
                 text: 'Services Nearby',
-                onTap: () => {
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ServicesNearMe())),
-                    }),
+                onTap: () async {
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ServicesNearMe()));
+                }),
             SizedBox(height: 15.0),
             CustomListTile(icon: Icons.event, text: 'Events', onTap: () => {}),
             SizedBox(height: 15.0),
+          
             CustomListTile(
                 icon: Icons.notifications,
                 text: 'Notification',
                 onTap: () => {}),
             SizedBox(height: 15.0),
             CustomListTile(
-              icon: Icons.phone,
-              text: 'Emergency',
-              onTap: () => Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => EmergencyContacts())),
-            ),
+                icon: Icons.phone,
+                text: 'Emergency',
+                onTap: () async {
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => EmergencyContacts()));
+                }),
             SizedBox(height: 15.0),
             CustomListTile(
                 icon: Icons.rate_review, text: 'Rate the App', onTap: () => {}),
             SizedBox(height: 15.0),
             CustomListTile(
-                icon: Icons.lock, text: 'Logout', onTap: _signOut,)
+              icon: Icons.lock,
+              text: 'Logout',
+              onTap: () async {
+                _confirmSignOut(context);
+              },
+            )
           ],
         )),
         body: Center(
@@ -284,7 +346,7 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             children: [
               Container(
-                  height: 134,
+                  height: 250,
                   margin: const EdgeInsets.all(7.0),
                   padding: const EdgeInsets.all(4.0),
                   decoration: BoxDecoration(
@@ -305,10 +367,67 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     Container(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                        child: buildDropdownButton(),
-                      ),
+                      child: Column(children: <Widget>[
+                        Padding(
+                          padding:
+                              const EdgeInsets.only(left: 16.0, right: 16.0),
+                          child: buildDropdownButton(context),
+                        ),
+                        Image(
+                          image: new AssetImage("assets/Givemeshelter.png"),
+                          height: 60.0,
+                          width: 140.0,
+                          colorBlendMode: BlendMode.darken,
+                        ),
+                        Stack(children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Container(
+                              width: 250.0,
+                              height: 100.0,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Text(
+                                    "Creating homes, jobs and rehabilitation for the homeless before they hit the streets",
+                                    style: GoogleFonts.yantramanav(
+                                        fontStyle: FontStyle.normal,
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.w600),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(left: 260.0, top: 10.0),
+                            child: RaisedButton(
+                                color: Colors.black45,
+                                splashColor: Colors.blue,
+                                onPressed: () => _launchUrl(url),
+                                child: RichText(
+                                    text: new TextSpan(
+                                        style: new TextStyle(
+                                          fontSize: 18.0,
+                                        ),
+                                        children: [
+                                      new TextSpan(
+                                        text: 'Visit',
+                                        style: TextStyle(
+                                          color: Colors.blueAccent,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      new TextSpan(
+                                          text: 'Here',
+                                          style: TextStyle(
+                                              color: Colors.yellow,
+                                              fontWeight: FontWeight.bold))
+                                    ]))),
+                          )
+                        ])
+                      ]),
                     ),
                   ])),
               SizedBox(height: 9.0),
@@ -327,11 +446,10 @@ class _HomePageState extends State<HomePage> {
                         physics: ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
                           return BlogTile(
-                            imageUrl: articles[index].urlToImage,
-                            title: articles[index].title,
-                            desc: articles[index].description,
-                            url: articles[index].url,
-                          );
+                              imageUrl: articles[index].urlToImage,
+                              title: articles[index].title,
+                              desc: articles[index].description,
+                              url: articles[index].url);
                         },
                       )),
                     )
@@ -340,7 +458,7 @@ class _HomePageState extends State<HomePage> {
         )));
   }
 
-  DropdownButton<Services> buildDropdownButton() {
+  DropdownButton<Services> buildDropdownButton(BuildContext context) {
     return DropdownButton(
         dropdownColor: Color.fromRGBO(130, 90, 255, 1),
         focusColor: Colors.black,
@@ -359,7 +477,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         isExpanded: true,
-        items: _dropdownMenuItems,
-        onChanged: onChangeDropdownItem);
+        items: buildDropdownMenuItems(services, context), onChanged: (Services value) {  },);
+        
   }
 }

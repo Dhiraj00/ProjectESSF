@@ -1,53 +1,56 @@
+
+
+import 'package:essf/servicecategories/Housingandhomeless.dart';
+import 'package:essf/servicecategories/Mentalhealth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 
-class Services  {
+
+  typedef pressed = void Function(BuildContext);
+
+class Services {
   final String services;
-  final Function onTap;
+  final pressed onPressed;
+  
 
-Services({@required this.services, this.onTap});
+  Services({@required this.services, this.onPressed});
 
-   static List<Services> serviceItems() {
+  static List<Services> serviceItems() {
     return <Services>[
       Services(
-        onTap: null,
-        services: 'Alcohol and Drugs', 
+        onPressed:(BuildContext context) =>print('hello'),
+        services: 'Alcohol and Drugs',
       ),
-
       Services(
-        onTap: _launchURL,
         services: 'Children and Families',
       ),
       Services(
-        onTap: null,
+        onPressed: (BuildContext context){print('hello');},
         services: 'Disability Support',
       ),
       Services(
-        onTap: null,
+        onPressed: null,
         services: 'Education, training & employment',
       ),
       Services(
-        onTap: null,
+        onPressed: null,
         services: 'Family & Domestic Violence',
       ),
       Services(
-        onTap: null,
+        onPressed:(BuildContext context)=>Navigator.pushReplacement(
+      context, MaterialPageRoute(builder: (BuildContext context) =>HousingandHomelessness(
+            ))),
         services: 'Housing and Homelessness',
       ),
       Services(
-        onTap: null,
+        onPressed: (BuildContext context){Navigator.pushReplacement(
+      context, MaterialPageRoute(builder: (BuildContext context) =>MentalHealth(
+            )));},
         services: 'Mental Health Recovery',
       ),
     ];
   }
 }
-_launchURL() async {
-  const url = 'https://www.missionaustralia.com.au/services?categoryIDs%5B%5D=185&postcode=&keywords=';
-  if (await canLaunch(url)) {
-    await launch(url);
-  } else {
-    throw 'Could not launch $url';
-  }
-}
+
+

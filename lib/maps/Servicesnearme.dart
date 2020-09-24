@@ -1,4 +1,5 @@
 import 'package:essf/Homepage.dart';
+import 'package:essf/auth.dart';
 import 'package:essf/maps/Geolocatorservice.dart';
 import 'package:essf/maps/Places_model.dart';
 import 'package:essf/maps/marker_service.dart';
@@ -9,7 +10,25 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class ServicesNearMe extends StatelessWidget {
+class ServicesNearMe extends StatefulWidget {
+  const ServicesNearMe({Key key, this.auth}) : super(key: key);
+
+  
+  final AuthBase auth;
+  @override
+  _ServicesNearMeState createState() => _ServicesNearMeState(auth:auth);
+}
+
+class _ServicesNearMeState extends State<ServicesNearMe> {
+  _ServicesNearMeState({@required this.auth});
+ 
+  AuthBase auth;
+  void initState(){
+  auth=Auth();
+    super.initState();
+  
+  }
+  
   @override
   Widget build(BuildContext context) {
     final currentPosition = Provider.of<Position>(context);
@@ -20,16 +39,20 @@ class ServicesNearMe extends StatelessWidget {
       create: (context) => placesProvider,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Services Nearby', style:TextStyle(fontWeight: FontWeight.w600)),
+          title: Center(
+            child: Text('Services Nearby',
+                
+            )
+          ),
           backgroundColor: Colors.blueAccent,
           elevation: 0.0,
           leading: IconButton(
               icon: Icon(Icons.home),
               onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomePage(auth: null)),
-                );
+             Navigator.pushReplacement(
+      context, MaterialPageRoute(builder: (BuildContext context) =>HomePage(auth: Auth(
+             ),)));
+                
               }),
           actions: <Widget>[
             IconButton(icon: Icon(Icons.notifications), onPressed: () {})
@@ -159,4 +182,7 @@ class ServicesNearMe extends StatelessWidget {
       throw 'could not launch $url';
     }
   }
+
+ 
+ 
 }

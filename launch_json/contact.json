@@ -1,0 +1,164 @@
+[
+    {
+        "name": "Child Protection Emergency Service",
+        "address": "70-80 Wellington Street",
+        "phone": "131278",
+        "location": {
+            "lat": -37.47130769999999,
+            "lng": 144.7851531
+        }
+    },
+    {
+        "name": "Direct Line (24-hr drug and alcohol counselling)",
+        "address": "-",
+        "phone": "1800 888 236",
+        "location": {
+            "lat": 0,
+            "lng": 0
+        }
+    },
+    {
+        "name": "Anglicare Victoria – St.Mark’s Community Centre",
+        "address": "250 George Street, Fitzroy",
+        "phone": "9419 3288",
+        "location": {
+            "lat": 144.98183499999999,
+            "lng": -37.801611000000001
+        }
+    },
+    {
+        "name": "Centrelink",
+        "address": "94 York Street,South Melbourne",
+        "phone": "132850",
+        "location": {
+            "lat": 144.95891399999999,
+            "lng": -37.830941000000003
+        }
+    },
+    {
+        "name": "Church of All Nations",
+        "address": "180 Palmerston Street,Carlton",
+        "phone": "9347 7077",
+        "location": {
+            "lat": 144.96864199999999,
+            "lng": -37.795940999999999
+        }
+    },
+    {
+        "name": "Depaul House",
+        "address": "9 Brunswick Street,Fitzroy",
+        "phone": "9231 2624",
+        "location": {
+            "lat": 144.976911,
+            "lng": -37.807402000000003
+        }
+    },
+    {
+        "name": "Flagstaff Crisis Accommodation",
+        "address": "Corner King and Roden Street, West Melbourne",
+        "phone": "9329 4800",
+        "location": {
+            "lat": 144.949896,
+            "lng": -37.806305999999999
+        }
+    },
+    {
+        "name": "The Drum Youth Services",
+        "address": "100 Drummond Street,Carlton",
+        "phone": "9663 6733",
+        "location": {
+            "lat": 144.96793600000001,
+            "lng": -37.804233000000004
+        }
+    },
+    {
+        "name": "Settlement Program",
+        "address": "58 Holland Court, Flemington",
+        "phone": "9376 2033",
+        "location": {
+            "lat": 144.93570700000001,
+            "lng": -37.787059999999997
+        }
+    },
+    {
+        "name": "Salvation Army Open Door",
+        "address": "166 Boundary Road, North Melbourne",
+        "phone": "9329 6988",
+        "location": {
+            "lat": 144.93988400000001,
+            "lng": -37.790064000000001
+        }
+    },
+    {
+        "name": "The Couch International Student Centre",
+        "address": "69 Bourke Street, Melbourne",
+        "phone": "9653 3299",
+        "location": {
+            "lat": 144.97162800000001,
+            "lng": -37.812514999999998
+        }
+    },
+    {
+        "name": "Salvation Army – Project 614",
+        "address": "69 Bourke Street, Melbourne",
+        "phone": "9653 3299",
+        "location": {
+            "lat": 144.97162800000001,
+            "lng": -37.812514999999998
+        }
+    },
+    {
+        "name": "The Market Place",
+        "address": "69 Bourke Street, Melbourne",
+        "phone": "9653 3299",
+        "location": {
+            "lat": 144.97162800000001,
+            "lng": -37.812514999999998
+        }
+    },
+    {
+        "name": "RDNS Homeless Person’s Program",
+        "address": "113 Rosslyn Street, West Melbourne",
+        "phone": " 1300 334 455",
+        "location": {
+            "lat": 144.95082500000001,
+            "lng": -37.808981000000003
+        }
+    },
+    {
+        "name": "Ozanam Community Centre",
+        "address": "Ozanam Community Centre, North Melbourne",
+        "phone": "9329 6733",
+        "location": {
+            "lat": 144.946225,
+            "lng": -37.800795000000001
+        }
+    },
+    {
+        "name": "Utility Relief Grant and Non-Mains Utility Relief Grant schemes",
+        "address": "",
+        "phone": "1800 658 521",
+        "location": {
+            "lat": 0,
+            "lng": 0
+        }
+    },
+    {
+        "name": "Launch Housing",
+        "address": "68 Oxford Street, Collingwood",
+        "phone": "03 9288 9611",
+        "location": {
+            "lat": 0,
+            "lng": 0
+        }
+    },
+    {
+        "name": "Launch Housing",
+        "address": "1/11 Chesterville Rd, Cheltenham VIC 3192",
+        "phone": "03 9556 5777",
+        "location": {
+            "lat": 0,
+            "lng": 0
+        }
+    }
+]

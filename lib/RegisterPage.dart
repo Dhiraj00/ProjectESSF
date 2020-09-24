@@ -1,8 +1,11 @@
 import 'package:essf/LoginPage.dart';
+import 'package:essf/Platformecxception.dart';
 import 'package:essf/auth.dart';
 import 'package:essf/platform_alert.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({this.auth});
@@ -31,64 +34,67 @@ class RegisterPageState extends State<RegisterPage> {
   RegisterPageState({@required this.auth});
   @override
   void initState() {
-    auth = Auth();
     super.initState();
+    auth = Auth();
+  }
+  void dispose(){
+    super.dispose();
+     _emailController.clear();
+   _passwordController.clear();
+    
   }
 
-  Future<void> _signInwithGoogle() async {
+  Future<void> _signInwithGoogle(BuildContext context) async {
     try {
-      await auth.signInwithGoogle();
-    } catch (e) {
-      PlatformAlertDialog(
-        title: 'Sign IN Failed',
-        content: e.toString(),
-        defaultActionText: 'OK',
-        cancelActionText: null,
-      ).show(context);
-    }
-  }
-
-  Future<void> _signInwithFacebook() async {
-    try {
-      await auth.signInWithFacebook();
-    } catch (e) {
-      PlatformAlertDialog(
-        title: 'Sign IN Failed',
-        content: e.toString(),
-        defaultActionText: 'OK',
-        cancelActionText: null,
-      ).show(context);
-    }
-  }
-
-  Future<void> _createUserWithEmailAndPassword() async {
-   
-      try {
-        if (_formkey.currentState.validate()) _formkey.currentState.save();
-        await auth.createUserWithEmailAndPassword(_email, _password);
-
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => LogInPage(),
-            ));
-        PlatformAlertDialog(
-          title: 'Verfication Required',
-          content: 'Email Verification Sent.Please check your Email, Thanks.',
-          defaultActionText: 'OK',
-          cancelActionText: null,
-        ).show(context);
-      } catch (error) {
-        PlatformAlertDialog(
-          title: 'Sign Up Failed',
-          content: error.toString(),
-          defaultActionText: 'OK',
-          cancelActionText: null,
-        ).show(context);
-        _emailController.clear();
-        _passwordController.clear();
+      await auth.signInwithGoogle(context);
+    } on PlatformException catch (e) {
+      if (e.code != 'ERROR_ABORTED_BY_USER') {
+        _showSignInError(context, e);
       }
+    }
+  }
 
+  Future<void> _signInwithFacebook(BuildContext context) async {
+    try {
+      await auth.signInWithFacebook(context);
+    } on PlatformException catch (e) {
+      if (e.code != 'ERROR_ABORTED_BY_USER') {
+        _showSignInError(context, e);
+      }
+    }
+  }
+
+  void _showSignInError(BuildContext context, PlatformException exception) {
+    PlatformExceptionAlertDialog(
+      title: 'Error',
+      exception: exception,
+    ).show(context);
+  }
+
+  Future<void> _createUserWithEmailAndPassword(BuildContext context) async {
+   
+    try {
+       if (_formkey.currentState.validate()) _formkey.currentState.save();
+      await auth.createUserWithEmailAndPassword(context,_email, _password);
+
+      Navigator.pop(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LogInPage(),
+          ));
+
+      PlatformAlertDialog(
+              title: 'Verfication Required',
+              content:
+                  'Email Verification Sent.Please check your Email, Thanks.',
+              defaultActionText: 'OK',
+              cancelActionText: null)
+          .show(context);
+    } on PlatformException catch (e) {
+      if (e.code != 'ERROR_ABORTED_BY_USER') {
+        _showSignInError(context, e);
+      }
+    }
   }
 
   Widget _companyLogo() {
@@ -112,11 +118,7 @@ class RegisterPageState extends State<RegisterPage> {
       maxLines: 2,
       textDirection: TextDirection.ltr,
       textAlign: TextAlign.center,
-      style: TextStyle(
-        color: Colors.yellow,
-        fontWeight: FontWeight.w900,
-        fontSize: 40,
-      ),
+      style: GoogleFonts.arbutus(fontSize: 27.0, color: Colors.yellowAccent),
     );
   }
 
@@ -174,7 +176,8 @@ class RegisterPageState extends State<RegisterPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         FlatButton(
-                          onPressed: _createUserWithEmailAndPassword,
+                          onPressed: () =>
+                              _createUserWithEmailAndPassword(context),
                           child: Text("Register now"),
                           color: Colors.blueGrey,
                           padding: EdgeInsets.only(
@@ -188,7 +191,7 @@ class RegisterPageState extends State<RegisterPage> {
                       children: <Widget>[
                         FlatButton(
                           onPressed: () {
-                            Navigator.pushReplacement(
+                            Navigator.pop(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => LogInPage(),
@@ -222,7 +225,7 @@ class RegisterPageState extends State<RegisterPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         new FlatButton(
-                            onPressed: _signInwithFacebook,
+                            onPressed: () => _signInwithFacebook(context),
                             child: Container(
                               height: 40.0,
                               width: 40.0,
@@ -243,7 +246,7 @@ class RegisterPageState extends State<RegisterPage> {
                                   )),
                             )),
                         new FlatButton(
-                            onPressed: _signInwithGoogle,
+                            onPressed: () => _signInwithGoogle(context),
                             child: Container(
                               height: 40.0,
                               width: 40.0,

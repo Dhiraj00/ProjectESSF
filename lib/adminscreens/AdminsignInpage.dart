@@ -1,65 +1,53 @@
+
 import 'package:essf/LoginPage.dart';
 import 'package:essf/Platformecxception.dart';
 import 'package:essf/auth.dart';
-import 'package:essf/platform_alert.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class ForgotScreen extends StatefulWidget {
-  ForgotScreen({this.auth});
+class Admin extends StatefulWidget {
+  const Admin({Key key, this.auth}) : super(key: key);
+
   final AuthBase auth;
   @override
-  _ForgotScreenState createState() => _ForgotScreenState(auth: auth);
+  _AdminState createState() => _AdminState(auth: Auth());
 }
 
-class _ForgotScreenState extends State<ForgotScreen> {
-  _ForgotScreenState({@required this.auth});
+class _AdminState extends State<Admin> {
+  _AdminState({
+    @required this.auth,
+  });
   AuthBase auth;
-
   final _formKey = new GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+ 
+  final FocusNode _passwordFocusNode = FocusNode();
   String get _email => _emailController.text;
+  String get _password => _passwordController.text;
 
   @override
   void initState() {
-  auth=Auth();
+    auth = Auth();
     super.initState();
   }
-  void dispose(){
+
+  void dispose() {
     super.dispose();
   }
-  
 
   void _showSignInError(BuildContext context, PlatformException exception) {
     PlatformExceptionAlertDialog(
-      title: 'Error',
+      title: 'Sign in Failed',
       exception: exception,
     ).show(context);
   }
-  
 
-  Future<void> _resetPassword(BuildContext context, email) async {
-    if (_formKey.currentState.validate()) _formKey.currentState.save();
-
+  Future<void> _signInWithEmailAndPassword(BuildContext context) async {
     try {
-      await auth.sendPasswordResetEmail(_email);
-     
-        Navigator.pop(
-            context,
-            MaterialPageRoute(
-              builder: (context) => LogInPage(),
-            ));
-      
-
-      PlatformAlertDialog(
-              title: "Reset password",
-              content:
-                  'Please check your email to change your password. If only an account exist with this email,You\'ll be able to change the password',
-              cancelActionText: null,
-              defaultActionText: 'ok')
-          .show(context);
+      if (_formKey.currentState.validate()) _formKey.currentState.save();
+      await auth.signInWithEmailAndPassword(context, _email, _password);
     } on PlatformException catch (e) {
       if (e.code != 'ERROR_ABORTED_BY_USER') {
         _showSignInError(context, e);
@@ -124,12 +112,35 @@ class _ForgotScreenState extends State<ForgotScreen> {
                         keyboardType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.next,
                       ),
+                      new TextFormField(
+                        focusNode: _passwordFocusNode,
+                        controller: _passwordController,
+                        validator: (_password) {
+                          if (_password.length < 6)
+                            return ("Password must have 6 characters");
+
+                          return null;
+                        },
+                        decoration: new InputDecoration(
+                            hintText: "Password",
+                            prefixIcon: Icon(
+                              Icons.vpn_key,
+                              color: Colors.white,
+                            )),
+                        keyboardType: TextInputType.emailAddress,
+                        obscureText: true,
+                        onEditingComplete: () async {
+                          _signInWithEmailAndPassword(context);
+                        },
+                        textInputAction: TextInputAction.done,
+                      ),
                       SizedBox(height: 20.0),
                       new Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
                           FlatButton(
-                            onPressed: () => _resetPassword(context, _email),
+                            onPressed: () =>
+                                _signInWithEmailAndPassword(context),
                             child: Text("Submit"),
                             color: Colors.blueGrey,
                             padding: EdgeInsets.only(
@@ -147,8 +158,7 @@ class _ForgotScreenState extends State<ForgotScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           FlatButton(
-            onPressed: ()  { 
-             
+            onPressed: () {
               Navigator.pop(
                   context,
                   MaterialPageRoute(

@@ -1,8 +1,12 @@
 import 'package:essf/LandingPage.dart';
+
 import 'package:essf/auth.dart';
+
 import 'package:essf/maps/Geolocatorservice.dart';
 import 'package:essf/maps/PlacesService.dart';
 import 'package:essf/maps/Places_model.dart';
+
+import 'package:essf/servicecategories/Mentalhealth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
@@ -26,6 +30,12 @@ class MyApp extends StatelessWidget {
         )
       ],
       child: new MaterialApp(
+       
+          routes: {
+           
+            '/login': (context) => LandingPage(auth: Auth()),
+            '/mental':(context) => MentalHealth(),
+          },
           debugShowCheckedModeBanner: false,
           theme: new ThemeData(primarySwatch: Colors.blue),
           home: LandingPage(

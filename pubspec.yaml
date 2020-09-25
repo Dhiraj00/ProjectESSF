@@ -49,6 +49,7 @@ dependencies:
   google_fonts: ^1.1.0
   file: ^5.2.1
   rate_my_app: ^0.7.1+1
+  fluttericon: ^1.0.7
   
   
   latlong: ^0.6.1
@@ -86,7 +87,9 @@ flutter:
      - lib/servicecategories/assets/bond.png
      - lib/servicecategories/assets/help.png
      - lib/servicecategories/json_contacts/contacts.json
+     - lib/servicecategories/json_contacts/education.json
      - lib/servicecategories/assets/findhousing.jpg
+     - lib/servicecategories/assets/Homelessed.jpg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 

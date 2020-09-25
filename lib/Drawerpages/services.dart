@@ -1,5 +1,6 @@
 
 
+import 'package:essf/servicecategories/Education.dart';
 import 'package:essf/servicecategories/Housingandhomeless.dart';
 import 'package:essf/servicecategories/Mentalhealth.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +31,9 @@ class Services {
         services: 'Disability Support',
       ),
       Services(
-        onPressed: null,
+        onPressed: (BuildContext context)=>Navigator.pushReplacement(
+      context, MaterialPageRoute(builder: (BuildContext context) =>Education(
+            ))),
         services: 'Education, training & employment',
       ),
       Services(

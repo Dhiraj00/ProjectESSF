@@ -9,6 +9,9 @@ class MentalHealth extends StatefulWidget {
 }
 
 class _MentalHealthState extends State<MentalHealth> {
+   bool descTextShowFlag = false;
+  final String desc1='During the COVID-19 pandemic, prioritising mental health and wellbeing has been more important than ever. This World Mental Health Day – October 10 – the message is simple: “Look after your mental health, Australia.';
+  final String desc2='If you or someone you care for is in need of immediate assistance you can contact the below National 24/7 Crisis Counselling Services';
   List data;
   ScrollController _scrollController = ScrollController(keepScrollOffset: true);
   void initState() {
@@ -64,17 +67,39 @@ class _MentalHealthState extends State<MentalHealth> {
                         color: Colors.white)),
               ),
             ),
-            Padding(
+           Padding(
               padding: const EdgeInsets.only(left: 30.0, top: 10.0),
-              child: Center(
-                child: Text(
-                    'During the COVID-19 pandemic, prioritising mental health and wellbeing has been more important than ever. This World Mental Health Day – October 10 – the message is simple: “Look after your mental health, Australia.',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 17,
-                        color: Colors.white)),
-              ),
-            ),
+              child: Column(
+                children: <Widget>[
+                  Text(desc1,
+                      maxLines: descTextShowFlag ? 18 : 3,
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontSize: 17,
+                          color: Colors.white)),
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        descTextShowFlag = !descTextShowFlag;
+                      });
+                    },
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          descTextShowFlag
+                              ? Text(
+                                  "Show Less",
+                                  style: TextStyle(color: Colors.white70),
+                                )
+                              : Text(
+                                  "Show More",
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+                        ]),
+                  )
+                ],
+              ))
           ],
         ));
   }
@@ -108,16 +133,38 @@ class _MentalHealthState extends State<MentalHealth> {
 
   Widget _description2() {
     return Padding(
-      padding: const EdgeInsets.only(left: 30.0, top: 10.0),
-      child: Center(
-        child: Text(
-            'If you or someone you care for is in need of immediate assistance you can contact the below National 24/7 Crisis Counselling Services:',
-            style: TextStyle(
-                fontWeight: FontWeight.w400,
-                fontSize: 17,
-                color: Colors.white)),
-      ),
-    );
+              padding: const EdgeInsets.only(left: 30.0, top: 10.0),
+              child: Column(
+                children: <Widget>[
+                  Text(desc2,
+                      maxLines: descTextShowFlag ? 18 : 3,
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontSize: 17,
+                          color: Colors.white)),
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        descTextShowFlag = !descTextShowFlag;
+                      });
+                    },
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          descTextShowFlag
+                              ? Text(
+                                  "Show Less",
+                                  style: TextStyle(color: Colors.white70),
+                                )
+                              : Text(
+                                  "Show More",
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+                        ]),
+                  )
+                ],
+              ));
   }
 
   Widget _helpline() {

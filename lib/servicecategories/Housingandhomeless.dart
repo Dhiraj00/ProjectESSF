@@ -9,6 +9,9 @@ class HousingandHomelessness extends StatefulWidget {
 }
 
 class _HousingandHomelessnessState extends State<HousingandHomelessness> {
+    bool descTextShowFlag = false;
+  final String desc2='Every night more than 116,000 people in Australia are homeless1 as a result of many complex factors including unemployment, mental health issues, substance misuse or the loss of a job or loved one. Homelessness is a problem that goes beyond not having access to safe shelter as it can wreak havoc on a person’s health, keep them out of work and leave them socially isolated.Across the nation, the extent of the problem is hidden as most people experiencing homelessness aren’t sleeping rough on the streets. Couch surfing, living in overcrowded and inadequate dwellings, sleeping in the car or relying on short-term accommodation can all be considered forms of homelessness. Learn more about homelessness';
+  final String desc1= 'Access to safe and secure housing is an integral part of independence and connection within a community. At Goget Shelter,we believe every person across the country should have access to safe and secure housing. In Australia however, the shortage of affordable housing and high rental costs means disadvantaged people are increasingly vulnerable to homelessness.';
   List data;
   ScrollController _scrollController = ScrollController(keepScrollOffset: true);
   void initState() {
@@ -53,17 +56,39 @@ class _HousingandHomelessnessState extends State<HousingandHomelessness> {
                       color: Colors.yellow,
                       fontSize: 20)),
             ),
-            Padding(
+           Padding(
               padding: const EdgeInsets.only(left: 30.0, top: 10.0),
-              child: Center(
-                child: Text(
-                    'Access to safe and secure housing is an integral part of independence and connection within a community. At Goget Shelter,we believe every person across the country should have access to safe and secure housing. In Australia however, the shortage of affordable housing and high rental costs means disadvantaged people are increasingly vulnerable to homelessness.',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 17,
-                        color: Colors.white)),
-              ),
-            ),
+              child: Column(
+                children: <Widget>[
+                  Text(desc1,
+                      maxLines: descTextShowFlag ? 18 : 3,
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontSize: 17,
+                          color: Colors.white)),
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        descTextShowFlag = !descTextShowFlag;
+                      });
+                    },
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          descTextShowFlag
+                              ? Text(
+                                  "Show Less",
+                                  style: TextStyle(color: Colors.white70),
+                                )
+                              : Text(
+                                  "Show More",
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+                        ]),
+                  )
+                ],
+              ))
           ],
         ));
   }
@@ -94,17 +119,39 @@ class _HousingandHomelessnessState extends State<HousingandHomelessness> {
                       color: Colors.yellow,
                       fontSize: 20)),
             ),
-            Padding(
+           Padding(
               padding: const EdgeInsets.only(left: 30.0, top: 10.0),
-              child: Center(
-                child: Text(
-                    'Every night more than 116,000 people in Australia are homeless1 as a result of many complex factors including unemployment, mental health issues, substance misuse or the loss of a job or loved one. Homelessness is a problem that goes beyond not having access to safe shelter as it can wreak havoc on a person’s health, keep them out of work and leave them socially isolated.Across the nation, the extent of the problem is hidden as most people experiencing homelessness aren’t sleeping rough on the streets. Couch surfing, living in overcrowded and inadequate dwellings, sleeping in the car or relying on short-term accommodation can all be considered forms of homelessness. Learn more about homelessness',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 17,
-                        color: Colors.white)),
-              ),
-            ),
+              child: Column(
+                children: <Widget>[
+                  Text(desc2,
+                      maxLines: descTextShowFlag ? 18 : 3,
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontSize: 17,
+                          color: Colors.white)),
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        descTextShowFlag = !descTextShowFlag;
+                      });
+                    },
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          descTextShowFlag
+                              ? Text(
+                                  "Show Less",
+                                  style: TextStyle(color: Colors.white70),
+                                )
+                              : Text(
+                                  "Show More",
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+                        ]),
+                  )
+                ],
+              )),
             Padding(
               padding: const EdgeInsets.only(left: 180.0),
               child: RaisedButton(
@@ -148,7 +195,7 @@ class _HousingandHomelessnessState extends State<HousingandHomelessness> {
       padding: const EdgeInsets.only(left: 30.0, top: 10.0),
       child: Center(
         child: Text(
-            'If you or someone you care for is in need of immediate assistance you can contact the below National 24/7 Crisis Counselling Services:',
+           'If you or someone you care for is in need of immediate assistance you can contact the below National 24/7 Crisis Counselling Services',
             style: TextStyle(
                 fontWeight: FontWeight.w400,
                 fontSize: 17,

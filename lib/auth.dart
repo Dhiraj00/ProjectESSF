@@ -1,9 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:essf/adminscreens/adminpage.dart';
+import 'package:essf/firestore/Firestore.dart';
 import 'package:essf/platform_alert.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-
 
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -20,16 +21,16 @@ abstract class AuthBase {
 
   Future<void> signInwithGoogle(BuildContext context);
   Future<void> signInWithFacebook(BuildContext context);
-  Future<void> createUserWithEmailAndPassword(BuildContext context,String email, String password);
-  Future<void> signInWithEmailAndPassword(BuildContext context,String email, String password);
+  Future<void> createUserWithEmailAndPassword(
+      BuildContext context, String name, String email, String password);
+  Future<void> signInWithEmailAndPassword(
+      BuildContext context, String email, String password);
   Future<void> signout();
   Future<void> sendPasswordResetEmail(String email);
   Future<bool> isEmailVerfied();
   Future<FirebaseUser> getCurrentUser();
+  
 }
-
-
-
 
 class Auth implements AuthBase {
   FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -51,47 +52,54 @@ class Auth implements AuthBase {
   Stream<User> get onAuthStateChanged {
     return _firebaseAuth.onAuthStateChanged.map(_userFromFirebase);
   }
-   static final FacebookLogin facebookSignIn = new FacebookLogin();
-    String _message = 'Log in/out by pressing the buttons below.';
+
+  static final FacebookLogin facebookSignIn = new FacebookLogin();
+  String _message = 'Log in/out by pressing the buttons below.';
 
   @override
-  Future<void> signInWithEmailAndPassword(BuildContext context,String email, String password) async {
+  Future<void> signInWithEmailAndPassword(
+      BuildContext context, String email, String password) async {
     final authResult = await _firebaseAuth.signInWithEmailAndPassword(
         email: email, password: password);
-        if(await getCurrentUser() !=null){
-    if (  authResult.user.isEmailVerified != null) {
-      PlatformAlertDialog(
-          title: 'Signed In',
-          content: 'You are now logged in',
-          cancelActionText: null,
-          defaultActionText: 'ok');
-    } else if (authResult.user.isEmailVerified == null)
-      PlatformAlertDialog(
-          title: 'Error',
-          content:
-              'Please check your email verification. Issue logging in with your email and password',
-          cancelActionText: null,
-          defaultActionText: 'ok');
-        }
+    if (await getCurrentUser() != null) {
+      if (authResult.user.isEmailVerified != null) {
+        PlatformAlertDialog(
+            title: 'Signed In',
+            content: 'You are now logged in',
+            cancelActionText: null,
+            defaultActionText: 'ok');
+      } else if (authResult.user.isEmailVerified == null)
+        PlatformAlertDialog(
+            title: 'Error',
+            content:
+                'Please check your email verification. Issue logging in with your email and password',
+            cancelActionText: null,
+            defaultActionText: 'ok');
+    }
     return _userFromFirebase(authResult.user);
   }
 
   @override
-  Future<void> createUserWithEmailAndPassword( BuildContext context,
+  Future createUserWithEmailAndPassword(
+    BuildContext context,
+    String name,
     String email,
     String password,
   ) async {
     assert(email != null);
     assert(password != null);
+    assert(name != null);
 
     try {
-      final authResult = await _firebaseAuth.createUserWithEmailAndPassword(
+      AuthResult authResult = await _firebaseAuth.createUserWithEmailAndPassword(
           email: email, password: password);
-
+      FirebaseUser user = authResult.user;
       if (authResult != null) {
         authResult.user.sendEmailVerification();
+        await DatabaseManager().createUserData(name, user.email,user.uid);
+
+        return user;
       }
-      return _userFromFirebase(authResult.user);
     } catch (error) {
       PlatformAlertDialog(
           title: 'Error',
@@ -99,7 +107,6 @@ class Auth implements AuthBase {
           cancelActionText: null,
           defaultActionText: 'ok');
     }
-    return null;
   }
 
   @override
@@ -124,14 +131,11 @@ class Auth implements AuthBase {
           ),
         );
 
-        return _userFromFirebase(authResult.user);}
-        return null;
-        
-      
-      
-      
-    }else {
-     throw PlatformException(
+        return _userFromFirebase(authResult.user);
+      }
+      return null;
+    } else {
+      throw PlatformException(
         code: 'ERROR_ABORTED_BY_USER',
         message: 'Sign in aborted by user',
       );
@@ -164,12 +168,10 @@ class Auth implements AuthBase {
         break;
     }
     return null;
-    
   }
-   void _showMessage(String message) {
-    
-      _message = message;
-   
+
+  void _showMessage(String message) {
+    _message = message;
   }
 
   @override
@@ -182,17 +184,39 @@ class Auth implements AuthBase {
     await _firebaseAuth.signOut();
   }
 
-  
   @override
-  Future<bool> isEmailVerfied()async {
+  Future<bool> isEmailVerfied() async {
     FirebaseUser user = await _firebaseAuth.currentUser();
     return user.isEmailVerified;
-   
   }
 
   @override
-  Future<FirebaseUser> getCurrentUser() async{
-   FirebaseUser user = await _firebaseAuth.currentUser();
+  Future<FirebaseUser> getCurrentUser() async {
+    FirebaseUser user = await _firebaseAuth.currentUser();
     return user;
   }
 }
+
+  authorizeAccess(BuildContext context){
+    
+      Firestore.instance.collection('/users').where('uid',isEqualTo:getCurrentUser().uid).getDocuments().then((docs){if(docs.documents[0].exists){if (docs.documents[0].data['role']=='admin'){
+              Navigator.of(context).push(new MaterialPageRoute(
+                builder:(BuildContext context)=>new AdminHome(
+      
+                )
+              ));
+            } 
+            else{
+              print('unAuthorized');
+            }
+              
+            }}
+            );
+        }
+      
+      getCurrentUser() async {
+         FirebaseUser user = await FirebaseAuth.instance.currentUser();
+         
+    return user.uid;
+}
+

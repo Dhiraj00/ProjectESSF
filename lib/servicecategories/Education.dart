@@ -1,8 +1,8 @@
 import 'package:essf/servicecategories/models/educationalmodel.dart';
-import 'package:fluttericon/font_awesome_icons.dart';
+
 import 'package:flutter/material.dart';
-import 'package:fluttericon/brandico_icons.dart';
-import 'package:google_fonts/google_fonts.dart';
+
+
 import 'package:url_launcher/url_launcher.dart';
 
 class Education extends StatefulWidget {
@@ -12,7 +12,8 @@ class Education extends StatefulWidget {
 
 class _EducationState extends State<Education> {
   bool descTextShowFlag = false;
-final String desc3='GiveMe Shelter has been classified as an essential community service and remains open during stage 4 restrictions in Victoria.If you are at risk of, or experiencing homelessness please call 1800 825 955 to speak to a housing support worker for adviceAnyone who is able to should contact homelessness services via phone rather than attending in person to minimise the risk of transmission.Still, if you need to go to a homelessness access point our Collingwood, St Kilda and Cheltenham offices remain open and can provide a crisis response to your immediate accommodation needs and connect you to other support services.';
+  final String desc3 =
+      'GiveMe Shelter has been classified as an essential community service and remains open during stage 4 restrictions in Victoria.If you are at risk of, or experiencing homelessness please call 1800 825 955 to speak to a housing support worker for adviceAnyone who is able to should contact homelessness services via phone rather than attending in person to minimise the risk of transmission.Still, if you need to go to a homelessness access point our Collingwood, St Kilda and Cheltenham offices remain open and can provide a crisis response to your immediate accommodation needs and connect you to other support services.';
   final String desc1 =
       "Every night more than 116,000 people in Australia are homeless1 as a result of many complex factors including unemployment, mental health issues, substance misuse or the loss of a job or loved one. Homelessness is a problem that goes beyond not having access to safe shelter as it can wreak havoc on a person’s health, keep them out of work and leave them socially isolated.Across the nation, the extent of the problem is hidden as most people experiencing homelessness aren’t sleeping rough on the streets. Couch surfing, living in overcrowded and inadequate dwellings, sleeping in the car or relying on short-term accommodation can all be considered forms of homelessness. Learn more about homelessness";
   final String desc2 =
@@ -122,47 +123,46 @@ final String desc3='GiveMe Shelter has been classified as an essential community
                       color: Colors.yellow,
                       fontSize: 20)),
             ),
-           Padding(
-              padding: const EdgeInsets.only(left: 30.0, top: 10.0),
-              child: Column(
-                children: <Widget>[
-                  Text(desc3,
-                      maxLines: descTextShowFlag ? 18 : 3,
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 17,
-                          color: Colors.white)),
-                  InkWell(
-                    onTap: () {
-                      setState(() {
-                        descTextShowFlag = !descTextShowFlag;
-                      });
-                    },
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          descTextShowFlag
-                              ? Text(
-                                  "Show Less",
-                                  style: TextStyle(color: Colors.white70),
-                                )
-                              : Text(
-                                  "Show More",
-                                  style: TextStyle(color: Colors.white70),
-                                ),
-                        ]),
-                  )
-                ],
-              )),
+            Padding(
+                padding: const EdgeInsets.only(left: 30.0, top: 10.0),
+                child: Column(
+                  children: <Widget>[
+                    Text(desc3,
+                        maxLines: descTextShowFlag ? 18 : 3,
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 17,
+                            color: Colors.white)),
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          descTextShowFlag = !descTextShowFlag;
+                        });
+                      },
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            descTextShowFlag
+                                ? Text(
+                                    "Show Less",
+                                    style: TextStyle(color: Colors.white70),
+                                  )
+                                : Text(
+                                    "Show More",
+                                    style: TextStyle(color: Colors.white70),
+                                  ),
+                          ]),
+                    )
+                  ],
+                )),
             Padding(
               padding: const EdgeInsets.only(left: 180.0),
               child: RaisedButton(
                   child: Text('Visit here'),
                   color: Color.fromRGBO(130, 90, 255, 1),
                   onPressed: () {
-                    _launchCalls(
-                        'https://givemeshelterenterprise.org/');
+                    _launchCalls('https://givemeshelterenterprise.org/');
                   }),
             ),
             new Container(
@@ -325,23 +325,28 @@ final String desc3='GiveMe Shelter has been classified as an essential community
                           return Card(
                               color: Color.fromRGBO(130, 90, 255, 1),
                               child: ListTile(
-                                  title: Text(
-                                    education[index].name,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
-                                  ),
-                                  leading: IconButton(
-                                    icon: Icon(Icons.call),
+                                title: Text(
+                                  education[index].name,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black),
+                                ),
+                                leading: IconButton(
+                                  icon: Icon(Icons.call),
+                                  onPressed: () {
+                                    (education[index].phone != null)
+                                        ? _launchCalls(
+                                            'tel: ${education[index].phone}')
+                                        : _launchCalls(null);
+                                  },
+                                  color: Colors.blueAccent,
+                                ),
+                                trailing: IconButton(
+                                    icon: Icon(Icons.web),
                                     onPressed: () {
-                                      (education[index].phone != null)
-                                          ? _launchCalls(
-                                              'tel: ${education[index].phone}')
-                                          : _launchCalls(null);
-                                    },
-                                    color: Colors.blueAccent,
-                                  ),
-                                  trailing: IconButton(icon: Icon(Icons.web), onPressed: (){_launchCalls(education[index].website);}),));
+                                      _launchCalls(education[index].website);
+                                    }),
+                              ));
                         }),
                   ),
                 ),
@@ -369,8 +374,7 @@ final String desc3='GiveMe Shelter has been classified as an essential community
               ),
               IconButton(
                 icon: Icon(Icons.open_in_browser),
-                onPressed: () => _launchCalls(
-                    "https://www.aihw.gov.au/"),
+                onPressed: () => _launchCalls("https://www.aihw.gov.au/"),
                 iconSize: 50,
               )
             ])
@@ -388,8 +392,6 @@ final String desc3='GiveMe Shelter has been classified as an essential community
         title: Center(
             child: Text(
           "Education & Homelessness",
-          style:
-              GoogleFonts.arbutus(fontSize: 16.0, color: Colors.yellowAccent),
         )),
         backgroundColor: Color.fromRGBO(130, 90, 255, 1),
         elevation: 0.0,
@@ -402,12 +404,11 @@ final String desc3='GiveMe Shelter has been classified as an essential community
   _body() {
     return SingleChildScrollView(
         child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-     
       _container1(),
       SizedBox(height: 10.0),
       _description(),
       SizedBox(height: 15.0),
-       _buttons(),
+      _buttons(),
       SizedBox(height: 10.0),
       _container2(),
       SizedBox(height: 10.0),

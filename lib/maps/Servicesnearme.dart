@@ -1,4 +1,4 @@
-import 'package:essf/Homepage.dart';
+
 import 'package:essf/auth.dart';
 import 'package:essf/maps/Geolocatorservice.dart';
 import 'package:essf/maps/Places_model.dart';
@@ -49,10 +49,7 @@ class _ServicesNearMeState extends State<ServicesNearMe> {
           leading: IconButton(
               icon: Icon(Icons.home),
               onPressed: () {
-             Navigator.pushReplacement(
-      context, MaterialPageRoute(builder: (BuildContext context) =>HomePage(auth: Auth(
-             ),)));
-                
+            Navigator.pushReplacementNamed(context, '/homepage');
               }),
           actions: <Widget>[
             IconButton(icon: Icon(Icons.notifications), onPressed: () {})

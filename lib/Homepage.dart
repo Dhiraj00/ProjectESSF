@@ -2,22 +2,26 @@ import 'dart:io';
 import 'package:essf/Drawerpages/Customlisttile.dart';
 import 'package:essf/Drawerpages/services.dart';
 
-
 import 'package:essf/News/news.dart';
+
 
 import 'package:essf/auth.dart';
 import 'package:essf/emergency/emergencypage.dart';
+import 'package:essf/firestore/Firestore.dart';
 import 'package:essf/maps/Servicesnearme.dart';
 import 'package:essf/models/articlemodel.dart';
 import 'package:essf/platform_alert.dart';
 
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
@@ -30,13 +34,17 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  
   _HomePageState({@required this.auth});
+
+ 
   List<ArticleModel> articles = new List<ArticleModel>();
   List<Services> services = Services.serviceItems();
-  
+
   bool _loading;
-  
+
   AuthBase auth;
+   UserManagement userObj = new UserManagement();
 
   @override
   void initState() {
@@ -61,7 +69,8 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  List<DropdownMenuItem<Services>> buildDropdownMenuItems(List companies,BuildContext context ) {
+  List<DropdownMenuItem<Services>> buildDropdownMenuItems(
+      List companies, BuildContext context) {
     List<DropdownMenuItem<Services>> items = List();
     for (Services category in services) {
       items.add(
@@ -82,9 +91,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   onChangeDropdownItem() {
-    setState(() {
-     
-    });
+    setState(() {});
   }
 
   File _image;
@@ -116,7 +123,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> _signOut(BuildContext context) async {
     try {
       await widget.auth.signout();
-     
+      Navigator.pushReplacementNamed(context, '/login');
     } on PlatformException catch (e) {
       return print(e.toString());
     }
@@ -136,20 +143,32 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    
     Future getImage(ImageSource source, {BuildContext context}) async {
       try {
         final pickedFile = await picker.getImage(source: source);
         if (pickedFile != null) {
           setState(() {
             _image = File(pickedFile.path);
-
             print('Image path $_image');
           });
         }
       } catch (e) {
         print(e.toString());
       }
+    }
+
+    Future _uploadPic(BuildContext context) async {
+      String filename = basename(_image.path);
+      StorageReference firebasestorageref =
+          FirebaseStorage.instance.ref().child(filename);
+      StorageUploadTask uploadTask = firebasestorageref.putFile(_image);
+      StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
+      setState(() {
+        print("profile picture uploaded");
+        Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text("Profile Picture Uploaded"),
+        ));
+      });
     }
 
     Future<void> _showPickOptionsDialog(BuildContext context) async {
@@ -163,6 +182,7 @@ class _HomePageState extends State<HomePage> {
                       ListTile(
                         onTap: () async {
                           await getImage(ImageSource.gallery);
+                          _uploadPic(context);
                           Navigator.pop(context);
                         },
                         title: Text('Pick image from your gallery'),
@@ -170,6 +190,7 @@ class _HomePageState extends State<HomePage> {
                       ListTile(
                         onTap: () async {
                           await getImage(ImageSource.camera);
+                          _uploadPic(context);
                           Navigator.pop(context);
                         },
                         title: Text('Capture photo'),
@@ -185,12 +206,16 @@ class _HomePageState extends State<HomePage> {
                       InkWell(
                         onTap: () async {
                           await getImage(ImageSource.gallery);
+                          _uploadPic(context);
+                          Navigator.pop(context);
                         },
                         child: Text('Pick image from your gallery'),
                       ),
                       ListTile(
                         onTap: () async {
                           await getImage(ImageSource.camera);
+                          _uploadPic(context);
+                          Navigator.pop(context);
                         },
                         title: Text('Capture photo'),
                       )
@@ -313,7 +338,6 @@ class _HomePageState extends State<HomePage> {
             SizedBox(height: 15.0),
             CustomListTile(icon: Icons.event, text: 'Events', onTap: () => {}),
             SizedBox(height: 15.0),
-          
             CustomListTile(
                 icon: Icons.notifications,
                 text: 'Notification',
@@ -329,8 +353,14 @@ class _HomePageState extends State<HomePage> {
                           builder: (context) => EmergencyContacts()));
                 }),
             SizedBox(height: 15.0),
+            
             CustomListTile(
-                icon: Icons.rate_review, text: 'Rate the App', onTap: () => {}),
+                icon: Icons.dashboard,
+                text: 'Admin Page',
+                onTap: () {
+                      
+                  userObj.authorizeAdmin(context);
+                    }),
             SizedBox(height: 15.0),
             CustomListTile(
               icon: Icons.lock,
@@ -460,24 +490,25 @@ class _HomePageState extends State<HomePage> {
 
   DropdownButton<Services> buildDropdownButton(BuildContext context) {
     return DropdownButton(
-        dropdownColor: Color.fromRGBO(130, 90, 255, 1),
-        focusColor: Colors.black,
-        isDense: true,
-        iconSize: 40,
-        elevation: 16,
-        hint: Center(
-          child: Text(
-            'Services Directory',
-            style: TextStyle(
-              color: Colors.white70,
-              fontWeight: FontWeight.w400,
-              fontSize: 18,
-              fontStyle: FontStyle.normal,
-            ),
+      dropdownColor: Color.fromRGBO(130, 90, 255, 1),
+      focusColor: Colors.black,
+      isDense: true,
+      iconSize: 40,
+      elevation: 16,
+      hint: Center(
+        child: Text(
+          'Services Directory',
+          style: TextStyle(
+            color: Colors.white70,
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
+            fontStyle: FontStyle.normal,
           ),
         ),
-        isExpanded: true,
-        items: buildDropdownMenuItems(services, context), onChanged: (Services value) {  },);
-        
+      ),
+      isExpanded: true,
+      items: buildDropdownMenuItems(services, context),
+      onChanged: (Services value) {},
+    );
   }
 }

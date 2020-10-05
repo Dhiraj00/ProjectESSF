@@ -1,7 +1,9 @@
 
 import 'package:essf/LoginPage.dart';
 import 'package:essf/Platformecxception.dart';
+import 'package:essf/adminscreens/adminpage.dart';
 import 'package:essf/auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -48,6 +50,8 @@ class _AdminState extends State<Admin> {
     try {
       if (_formKey.currentState.validate()) _formKey.currentState.save();
       await auth.signInWithEmailAndPassword(context, _email, _password);
+        Navigator.of(context).push(new CupertinoPageRoute(
+                        builder: (context) => AdminHome()));
     } on PlatformException catch (e) {
       if (e.code != 'ERROR_ABORTED_BY_USER') {
         _showSignInError(context, e);

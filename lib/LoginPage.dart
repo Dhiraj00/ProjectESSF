@@ -124,6 +124,7 @@ class _LogInPageState extends State<LogInPage> {
               primarySwatch: Colors.blue,
             ),
             child: Container(
+              
               padding: const EdgeInsets.all(60.0),
               child: new Column(
                 mainAxisAlignment: MainAxisAlignment.center,

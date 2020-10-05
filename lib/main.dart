@@ -1,3 +1,4 @@
+import 'package:essf/Homepage.dart';
 import 'package:essf/LandingPage.dart';
 
 import 'package:essf/auth.dart';
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
           routes: {
            
             '/login': (context) => LandingPage(auth: Auth()),
+            '/homepage':(context) => HomePage(auth: Auth()),
             '/mental':(context) => MentalHealth(),
           },
           debugShowCheckedModeBanner: false,

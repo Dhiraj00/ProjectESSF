@@ -1,4 +1,4 @@
-import 'package:essf/Homepage.dart';
+
 import 'package:essf/auth.dart';
 import 'package:essf/emergency/contact.dart';
 
@@ -45,14 +45,7 @@ class _EmergencyContactsState extends State<EmergencyContacts> {
           backgroundColor: Colors.blueAccent,
           leading: IconButton(
             onPressed: () {
-              
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => HomePage(
-                            auth: Auth(),
-                          )),
-                );
+              Navigator.pushReplacementNamed(context, '/homepage');
               
             },
             icon: Icon(

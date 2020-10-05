@@ -23,11 +23,12 @@ class RegisterPage extends StatefulWidget {
 class RegisterPageState extends State<RegisterPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _nameController =TextEditingController();
 
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
-  String get _email => _emailController.text;
-  String get _password => _passwordController.text;
+  final FocusNode _nameFocusNode =FocusNode();
+
   final _formkey = new GlobalKey<FormState>();
 
   AuthBase auth;
@@ -75,7 +76,7 @@ class RegisterPageState extends State<RegisterPage> {
    
     try {
        if (_formkey.currentState.validate()) _formkey.currentState.save();
-      await auth.createUserWithEmailAndPassword(context,_email, _password);
+      await auth.createUserWithEmailAndPassword(context,_nameController.text,_emailController.text, _passwordController.text);
 
       Navigator.pop(
           context,
@@ -136,6 +137,23 @@ class RegisterPageState extends State<RegisterPage> {
               child: new Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
+                  new TextFormField(
+                    focusNode: _nameFocusNode,
+                    controller: _nameController,
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (String _name) {
+                      if (!_name.contains(' ') || _name.isEmpty)
+                        return ("please type your Full name");
+
+                      return null;
+                    },
+                    decoration: new InputDecoration(
+                        hintText: "Full Name",
+                        prefixIcon: Icon(
+                          Icons.person,
+                          color: Colors.white,
+                        )),
+                  ),
                   new TextFormField(
                     focusNode: _emailFocusNode,
                     controller: _emailController,

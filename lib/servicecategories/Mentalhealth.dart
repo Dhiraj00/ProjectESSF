@@ -1,6 +1,6 @@
 import 'package:essf/servicecategories/models/helpline.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 
 class MentalHealth extends StatefulWidget {
@@ -248,9 +248,7 @@ class _MentalHealthState extends State<MentalHealth> {
         title: Center(
             child: Text(
           "Mental Health",
-          style:
-              GoogleFonts.arbutus(fontSize: 20.0, color: Colors.yellowAccent),
-          textAlign: TextAlign.end,
+         
         )),
         backgroundColor: Color.fromRGBO(130, 90, 255, 1),
         elevation: 0.0,

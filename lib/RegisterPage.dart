@@ -23,11 +23,14 @@ class RegisterPage extends StatefulWidget {
 class RegisterPageState extends State<RegisterPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _nameController =TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  String get _name => _nameController.text;
+  String get _email => _emailController.text;
+  String get _password => _passwordController.text;
 
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
-  final FocusNode _nameFocusNode =FocusNode();
+  final FocusNode _nameFocusNode = FocusNode();
 
   final _formkey = new GlobalKey<FormState>();
 
@@ -38,11 +41,11 @@ class RegisterPageState extends State<RegisterPage> {
     super.initState();
     auth = Auth();
   }
-  void dispose(){
+
+  void dispose() {
     super.dispose();
-     _emailController.clear();
-   _passwordController.clear();
-    
+    _emailController.clear();
+    _passwordController.clear();
   }
 
   Future<void> _signInwithGoogle(BuildContext context) async {
@@ -72,11 +75,12 @@ class RegisterPageState extends State<RegisterPage> {
     ).show(context);
   }
 
-  Future<void> _createUserWithEmailAndPassword(BuildContext context) async {
-   
+  Future<void> _createUserWithEmailAndPassword(
+      BuildContext context, name, email, pasword) async {
+    if (_formkey.currentState.validate()) _formkey.currentState.save();
     try {
-       if (_formkey.currentState.validate()) _formkey.currentState.save();
-      await auth.createUserWithEmailAndPassword(context,_nameController.text,_emailController.text, _passwordController.text);
+      await auth.createUserWithEmailAndPassword(
+          context, _name, _email, _password);
 
       Navigator.pop(
           context,
@@ -84,13 +88,20 @@ class RegisterPageState extends State<RegisterPage> {
             builder: (context) => LogInPage(),
           ));
 
-      PlatformAlertDialog(
-              title: 'Verfication Required',
-              content:
-                  'Email Verification Sent.Please check your Email, Thanks.',
-              defaultActionText: 'OK',
-              cancelActionText: null)
-          .show(context);
+      (_formkey.currentState.validate())
+          ? PlatformAlertDialog(
+                  title: 'Verfication Required',
+                  content:
+                      'Email Verification Sent.Please check your Email, Thanks.',
+                  defaultActionText: 'OK',
+                  cancelActionText: null)
+              .show(context)
+          : PlatformAlertDialog(
+                  title: 'Error',
+                  content: 'Invalid Credentials',
+                  cancelActionText: null,
+                  defaultActionText: 'ok')
+              .show(context);
     } on PlatformException catch (e) {
       if (e.code != 'ERROR_ABORTED_BY_USER') {
         _showSignInError(context, e);
@@ -143,7 +154,7 @@ class RegisterPageState extends State<RegisterPage> {
                     keyboardType: TextInputType.emailAddress,
                     validator: (String _name) {
                       if (!_name.contains(' ') || _name.isEmpty)
-                        return ("please type your Full name");
+                        return ("Please type your Full name");
 
                       return null;
                     },
@@ -159,8 +170,11 @@ class RegisterPageState extends State<RegisterPage> {
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     validator: (String _email) {
-                      if (!_email.contains('@') || _email.isEmpty)
-                        return ("please type an email");
+                      if (_email.isEmpty) {
+                        return ("Please type an email");
+                      } else if (!_email.contains('@')) {
+                        return ("Invalid Email");
+                      }
 
                       return null;
                     },
@@ -175,8 +189,16 @@ class RegisterPageState extends State<RegisterPage> {
                     focusNode: _passwordFocusNode,
                     controller: _passwordController,
                     validator: (_password) {
-                      if (_password.length < 8)
+                      if (_password.length < 6) {
                         return ("Password must have 6 characters");
+                      } else if (!_password.contains(new RegExp(r'[A-Z]'))) {
+                        return ("upperCase Required ");
+                      } else if (!_password.contains(new RegExp(r'[0-9]'))) {
+                        return ("Password should have atleast one single digit");
+                      } else if (!_password
+                          .contains(new RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
+                        return ("Password needs to have special character");
+                      }
 
                       return null;
                     },
@@ -194,8 +216,8 @@ class RegisterPageState extends State<RegisterPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         FlatButton(
-                          onPressed: () =>
-                              _createUserWithEmailAndPassword(context),
+                          onPressed: () => _createUserWithEmailAndPassword(
+                              context, _name, _email, _password),
                           child: Text("Register now"),
                           color: Colors.blueGrey,
                           padding: EdgeInsets.only(

@@ -1,4 +1,4 @@
-import 'package:essf/Homepage.dart';
+
 import 'package:essf/adminscreens/addeventpage.dart';
 
 
@@ -39,10 +39,7 @@ class _AdminHomeState extends State<AdminHome> {
               children: <Widget>[
                 new GestureDetector(
                   onTap: () {
-                    Navigator.of(context).push(new CupertinoPageRoute(
-                        builder: (context) => HomePage(
-                              auth: null,
-                            )));
+                    Navigator.pushReplacementNamed(context, '/homepage');
                   },
                   child: new CircleAvatar(
                     maxRadius: 70.0,

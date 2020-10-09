@@ -1,17 +1,17 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:essf/Drawerpages/Customlisttile.dart';
 import 'package:essf/Drawerpages/services.dart';
 
 import 'package:essf/News/news.dart';
 
-
 import 'package:essf/auth.dart';
 import 'package:essf/emergency/emergencypage.dart';
+import 'package:essf/events/eventspage.dart';
 import 'package:essf/firestore/Firestore.dart';
 import 'package:essf/maps/Servicesnearme.dart';
 import 'package:essf/models/articlemodel.dart';
 import 'package:essf/platform_alert.dart';
-
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -34,17 +34,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  
   _HomePageState({@required this.auth});
 
- 
   List<ArticleModel> articles = new List<ArticleModel>();
   List<Services> services = Services.serviceItems();
 
   bool _loading;
 
   AuthBase auth;
-   UserManagement userObj = new UserManagement();
+  UserManagement userObj = new UserManagement();
 
   @override
   void initState() {
@@ -95,7 +93,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   File _image;
-
+  String imageUrl;
   final ImagePicker picker = ImagePicker();
 
   FirebaseUser currentUser;
@@ -106,6 +104,17 @@ class _HomePageState extends State<HomePage> {
 
   void _loadCurrentUser() {
     FirebaseAuth.instance.currentUser().then((FirebaseUser user) {
+      Firestore.instance
+          .collection('users')
+          .where('email', isEqualTo: user.email)
+          .getDocuments()
+          .then((querySnapshot) {
+        if (querySnapshot.documents[0].exists) {
+          setState(() {
+            imageUrl = querySnapshot.documents[0].data['url'];
+          });
+        }
+      });
       setState(() {
         this.currentUser = user;
       });
@@ -163,6 +172,10 @@ class _HomePageState extends State<HomePage> {
           FirebaseStorage.instance.ref().child(filename);
       StorageUploadTask uploadTask = firebasestorageref.putFile(_image);
       StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
+      final String url = (await taskSnapshot.ref.getDownloadURL());
+      await DatabaseManager().updateUserImage(currentUser.email, url);
+      print(currentUser.email);
+      print('URL Is $url');
       setState(() {
         print("profile picture uploaded");
         Scaffold.of(context).showSnackBar(SnackBar(
@@ -172,55 +185,30 @@ class _HomePageState extends State<HomePage> {
     }
 
     Future<void> _showPickOptionsDialog(BuildContext context) async {
-      return (Platform.isIOS != false)
-          ? await showCupertinoDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                      content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      ListTile(
-                        onTap: () async {
-                          await getImage(ImageSource.gallery);
-                          _uploadPic(context);
-                          Navigator.pop(context);
-                        },
-                        title: Text('Pick image from your gallery'),
-                      ),
-                      ListTile(
-                        onTap: () async {
-                          await getImage(ImageSource.camera);
-                          _uploadPic(context);
-                          Navigator.pop(context);
-                        },
-                        title: Text('Capture photo'),
-                      )
-                    ],
-                  )))
-          : await showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                      content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      InkWell(
-                        onTap: () async {
-                          await getImage(ImageSource.gallery);
-                          _uploadPic(context);
-                          Navigator.pop(context);
-                        },
-                        child: Text('Pick image from your gallery'),
-                      ),
-                      ListTile(
-                        onTap: () async {
-                          await getImage(ImageSource.camera);
-                          _uploadPic(context);
-                          Navigator.pop(context);
-                        },
-                        title: Text('Capture photo'),
-                      )
-                    ],
-                  )));
+      return await showCupertinoDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                  content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  ListTile(
+                    onTap: () async {
+                      await getImage(ImageSource.gallery);
+                      _uploadPic(context);
+                      Navigator.pop(context);
+                    },
+                    title: Text('Pick image from your gallery'),
+                  ),
+                  ListTile(
+                    onTap: () async {
+                      await getImage(ImageSource.camera);
+                      _uploadPic(context);
+                      Navigator.pop(context);
+                    },
+                    title: Text('Capture photo'),
+                  )
+                ],
+              )));
     }
 
     void _launchUrl(url) async {
@@ -268,13 +256,16 @@ class _HomePageState extends State<HomePage> {
                           radius: 60,
                           backgroundColor: Colors.black,
                           child: ClipOval(
+
                             child: SizedBox(
-                              width: 100.0,
-                              height: 100.0,
-                              child: _image == null
-                                  ? Image.asset("assets/Givemeshelter.png")
-                                  : Image.file(_image, fit: BoxFit.fill),
-                            ),
+                                width: 115.0,
+                                height: 115.0,
+                                child: _image == null
+                                    ? (imageUrl == null
+                                        ? Image.asset(
+                                            "assets/Givemeshelter.png",fit: BoxFit.fill,)
+                                        : Image.network(imageUrl, fit: BoxFit.fill,))
+                                    : Image.file(_image,fit: BoxFit.fill,)),
                           ),
                         ),
                       ),
@@ -336,7 +327,13 @@ class _HomePageState extends State<HomePage> {
                           builder: (context) => ServicesNearMe()));
                 }),
             SizedBox(height: 15.0),
-            CustomListTile(icon: Icons.event, text: 'Events', onTap: () => {}),
+            CustomListTile(
+                icon: Icons.event,
+                text: 'Events',
+                onTap: () => {
+                      Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (context) => EventsPage()))
+                    }),
             SizedBox(height: 15.0),
             CustomListTile(
                 icon: Icons.notifications,
@@ -353,14 +350,14 @@ class _HomePageState extends State<HomePage> {
                           builder: (context) => EmergencyContacts()));
                 }),
             SizedBox(height: 15.0),
-            
             CustomListTile(
                 icon: Icons.dashboard,
                 text: 'Admin Page',
                 onTap: () {
-                      
+                  Navigator.of(context).pop();
+
                   userObj.authorizeAdmin(context);
-                    }),
+                }),
             SizedBox(height: 15.0),
             CustomListTile(
               icon: Icons.lock,

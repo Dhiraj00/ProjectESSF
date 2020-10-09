@@ -30,11 +30,17 @@ class PlatformExceptionAlertDialog extends PlatformAlertDialog{
   ///   • `ERROR_INVALID` - Indicates the email address is invalid.
 'ERROR_INVALID_CREDENTIAL' : 'Email address is malformed.' ,
 'ERROR_INVALID_EMAIL': 'The email is not valid',
- 'ERROR_WRONG_PASSWORD' : 'The password is invalid',
+ 
 'ERROR_USER_NOT_FOUND':  'User not found',
   ///   • `ERROR_USER_DISABLED` - If the user has been disabled (for example, in the Firebase console)
   ///   • `ERROR_TOO_MANY_REQUESTS` - If there was too many attempts to sign in as this user.
-  'ERROR_OPERATION_NOT_ALLOWED':  'Email and Password Accounts are not enabled'
+  'ERROR_OPERATION_NOT_ALLOWED':  'Email and Password Accounts are not enabled',
+  //ERROR_USER_DISABLED` - If the user has been disabled (for example, in the Firebase console)
+ 'ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL' : 'Please check your credential',
+  ///       Resolve this case by calling [fetchSignInMethodsForEmail] and then asking the user to sign in using one of them.
+  ///       This error will only be thrown if the "One account per email address" setting is enabled in the Firebase console (recommended).
+  ///  * `ERROR_OPERATION_NOT_ALLOWED` - Indicates that Google accounts are not enabled.
+  ///  * `ERROR_INVALID_ACTION_CODE` - If the action code in the link is malformed, expired, or has already been used.
   
   };
 }

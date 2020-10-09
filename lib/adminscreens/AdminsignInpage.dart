@@ -1,8 +1,8 @@
-
 import 'package:essf/LoginPage.dart';
 import 'package:essf/Platformecxception.dart';
-import 'package:essf/adminscreens/adminpage.dart';
+
 import 'package:essf/auth.dart';
+import 'package:essf/firestore/Firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,7 +24,7 @@ class _AdminState extends State<Admin> {
   final _formKey = new GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
- 
+
   final FocusNode _passwordFocusNode = FocusNode();
   String get _email => _emailController.text;
   String get _password => _passwordController.text;
@@ -32,8 +32,11 @@ class _AdminState extends State<Admin> {
   @override
   void initState() {
     auth = Auth();
+
     super.initState();
   }
+
+  UserManagement userObj = new UserManagement();
 
   void dispose() {
     super.dispose();
@@ -50,8 +53,7 @@ class _AdminState extends State<Admin> {
     try {
       if (_formKey.currentState.validate()) _formKey.currentState.save();
       await auth.signInWithEmailAndPassword(context, _email, _password);
-        Navigator.of(context).push(new CupertinoPageRoute(
-                        builder: (context) => AdminHome()));
+      userObj.authorizeAdmin(context);
     } on PlatformException catch (e) {
       if (e.code != 'ERROR_ABORTED_BY_USER') {
         _showSignInError(context, e);
@@ -102,8 +104,11 @@ class _AdminState extends State<Admin> {
                       new TextFormField(
                         controller: _emailController,
                         validator: (String _email) {
-                          if (!_email.contains('@') || _email.isEmpty)
-                            return ("please type an email");
+                          if (!_email.contains('@')) {
+                            return ("Invalid Email");
+                          } else if (_email.isEmpty) {
+                            return ("Please type an email");
+                          }
 
                           return null;
                         },
@@ -120,8 +125,9 @@ class _AdminState extends State<Admin> {
                         focusNode: _passwordFocusNode,
                         controller: _passwordController,
                         validator: (_password) {
-                          if (_password.length < 6)
+                          if (_password.length < 6) {
                             return ("Password must have 6 characters");
+                          }
 
                           return null;
                         },

@@ -1,4 +1,3 @@
-
 import 'package:essf/auth.dart';
 import 'package:essf/emergency/contact.dart';
 
@@ -6,11 +5,10 @@ import 'package:flutter/material.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 
-
 class EmergencyContacts extends StatefulWidget {
   final AuthBase auth;
 
-  const EmergencyContacts({ this.auth}) ;
+  const EmergencyContacts({this.auth});
   @override
   _EmergencyContactsState createState() => _EmergencyContactsState(auth: auth);
 }
@@ -19,15 +17,10 @@ class _EmergencyContactsState extends State<EmergencyContacts> {
   _EmergencyContactsState({@required this.auth});
   AuthBase auth;
 
-
-  
   void initState() {
-     auth = Auth();
+    auth = Auth();
 
     super.initState();
-   
-   
-   
   }
 
   List data;
@@ -46,7 +39,6 @@ class _EmergencyContactsState extends State<EmergencyContacts> {
           leading: IconButton(
             onPressed: () {
               Navigator.pushReplacementNamed(context, '/homepage');
-              
             },
             icon: Icon(
               Icons.home,

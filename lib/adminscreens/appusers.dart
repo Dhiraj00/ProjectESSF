@@ -10,7 +10,8 @@ class AppUsers extends StatefulWidget {
 
 class _AppUsersState extends State<AppUsers> {
   TextEditingController _nameController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  TextEditingController _roleController = TextEditingController();
   List userProfilesList = [];
   String userID = "";
   @override
@@ -49,7 +50,6 @@ class _AppUsersState extends State<AppUsers> {
             onPressed: () {
               Navigator.pop(context);
             }),
-           
       ),
       body: Container(
         child: ListView.builder(
@@ -57,35 +57,58 @@ class _AppUsersState extends State<AppUsers> {
             itemBuilder: (context, index) {
               return Card(
                 child: ListTile(
-                    title: Text(userProfilesList[index]['name']),
-                    subtitle: Text(userProfilesList[index]['email']),
-                    leading: CircleAvatar(
-                      child:
-                          Image(image: AssetImage('assets/Givemeshelter.png')),
-                    ),
-                    trailing: IconButton(icon: Icon(Icons.delete, color: Colors.red,), onPressed: (){
-                      DatabaseManager().deleteData(userProfilesList[index]['name'], userProfilesList[index]['email'],userProfilesList[index]['uid'] );
-                    }),),
+                  onTap: () {
+                    openDialogueBox(context, userProfilesList[index]['email'],
+                        userProfilesList[index]['uid']);
+                  },
+                  title: Text(userProfilesList[index]['name']),
+                  subtitle: Text(userProfilesList[index]['email']),
+                  leading: CircleAvatar(
+                    radius: 30,
+                    child:ClipOval(
+                     child: SizedBox(
+                       height:180,
+                       width:180,
+                    child: (userProfilesList[index]['url'] == null)
+                        ? Image(image: AssetImage('assets/Givemeshelter.png',),fit: BoxFit.fill,)
+                        : Image.network(userProfilesList[index]['url'],fit: BoxFit.fill,),
+                  ),)),
+                  trailing: IconButton(
+                      icon: Icon(
+                        Icons.delete,
+                        color: Colors.red,
+                      ),
+                      onPressed: () {
+                        DatabaseManager().deleteData(
+                            userProfilesList[index]['name'],
+                            userProfilesList[index]['email'],
+                            userProfilesList[index]['uid']);
+                      }),
+                ),
               );
             }),
       ),
     );
   }
 
-  openDialogueBox(BuildContext context) {
+  openDialogueBox(BuildContext context, String email, String uid) {
+    _emailController.text = email;
     return showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
-            
             title: Text('Edit User Details'),
             content: Container(
-                height: 100,
+                height: 150,
                 child: Column(
                   children: [
                     TextField(
                       controller: _nameController,
                       decoration: InputDecoration(hintText: 'Name'),
+                    ),
+                    TextField(
+                      controller: _roleController,
+                      decoration: InputDecoration(hintText: 'role'),
                     ),
                     TextField(
                       controller: _emailController,
@@ -94,8 +117,17 @@ class _AppUsersState extends State<AppUsers> {
                   ],
                 )),
             actions: [
-              FlatButton(onPressed: () {}, child: Text('Submit')),
-              FlatButton(onPressed: () {}, child: Text('Cancel'))
+              FlatButton(
+                  onPressed: () {
+                    DatabaseManager().updateUserList(
+                        _nameController.text, email, _roleController.text, uid);
+                  },
+                  child: Text('Submit')),
+              FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('Cancel'))
             ],
           );
         });

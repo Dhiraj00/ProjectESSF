@@ -1,12 +1,9 @@
 import 'package:essf/Homepage.dart';
 import 'package:essf/LandingPage.dart';
-
 import 'package:essf/auth.dart';
-
 import 'package:essf/maps/Geolocatorservice.dart';
 import 'package:essf/maps/PlacesService.dart';
 import 'package:essf/maps/Places_model.dart';
-
 import 'package:essf/servicecategories/Mentalhealth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';

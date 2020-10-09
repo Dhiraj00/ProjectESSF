@@ -1,4 +1,3 @@
-
 import 'package:essf/Platformecxception.dart';
 import 'package:essf/RegisterPage.dart';
 import 'package:essf/adminscreens/AdminsignInpage.dart';
@@ -38,8 +37,8 @@ class _LogInPageState extends State<LogInPage> {
 
   void dispose() {
     super.dispose();
-   _emailController.clear();
-   _passwordController.clear();
+    _emailController.clear();
+    _passwordController.clear();
   }
 
   final scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -124,7 +123,6 @@ class _LogInPageState extends State<LogInPage> {
               primarySwatch: Colors.blue,
             ),
             child: Container(
-              
               padding: const EdgeInsets.all(60.0),
               child: new Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -133,8 +131,11 @@ class _LogInPageState extends State<LogInPage> {
                     focusNode: _emailFocusNode,
                     controller: _emailController,
                     validator: (String _email) {
-                      if (!_email.contains('@') || _email.isEmpty)
-                        return ("please type an email");
+                      if (!_email.contains('@')) {
+                        return ("Invalid Email");
+                      } else if (_email.isEmpty) {
+                        return ("Please type an email");
+                      }
 
                       return null;
                     },
@@ -152,8 +153,9 @@ class _LogInPageState extends State<LogInPage> {
                     focusNode: _passwordFocusNode,
                     controller: _passwordController,
                     validator: (_password) {
-                      if (_password.length < 6)
+                      if (_password.length < 6) {
                         return ("Password must have 6 characters");
+                      } 
 
                       return null;
                     },

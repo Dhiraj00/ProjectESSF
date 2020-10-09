@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+
 class User {
   User({@required this.uid});
   String uid;
@@ -29,21 +30,19 @@ abstract class AuthBase {
   Future<void> sendPasswordResetEmail(String email);
   Future<bool> isEmailVerfied();
   Future<FirebaseUser> getCurrentUser();
-  
 }
 
 class Auth implements AuthBase {
   FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   User _userFromFirebase(FirebaseUser user) {
+    try{
     if (user.isEmailVerified == true) {
-      return User(uid: user.uid);
-    } else if (user.isEmailVerified == false) {
-      PlatformAlertDialog(
-          title: 'Error',
-          content:
-              'Please check your email. Issue logging in with your email and password',
-          cancelActionText: null,
-          defaultActionText: 'ok');
+      return User(uid: user.uid);}
+    } on PlatformException catch (e) {
+      if (e.code != 'ERROR_ABORTED_BY_USER') {
+        PlatformAlertDialog(title: 'Error', content: e.toString(), cancelActionText: null, defaultActionText: 'ok');
+      }
+     
     }
     return null;
   }
@@ -91,12 +90,12 @@ class Auth implements AuthBase {
     assert(name != null);
 
     try {
-      AuthResult authResult = await _firebaseAuth.createUserWithEmailAndPassword(
-          email: email, password: password);
+      AuthResult authResult = await _firebaseAuth
+          .createUserWithEmailAndPassword(email: email, password: password);
       FirebaseUser user = authResult.user;
       if (authResult != null) {
         authResult.user.sendEmailVerification();
-        await DatabaseManager().createUserData(name, user.email,user.uid);
+        await DatabaseManager().createUserData(name, user.email,null, user.uid);
 
         return user;
       }
@@ -197,26 +196,25 @@ class Auth implements AuthBase {
   }
 }
 
-  authorizeAccess(BuildContext context){
-    
-      Firestore.instance.collection('/users').where('uid',isEqualTo:getCurrentUser().uid).getDocuments().then((docs){if(docs.documents[0].exists){if (docs.documents[0].data['role']=='admin'){
-              Navigator.of(context).push(new MaterialPageRoute(
-                builder:(BuildContext context)=>new AdminHome(
-      
-                )
-              ));
-            } 
-            else{
-              print('unAuthorized');
-            }
-              
-            }}
-            );
-        }
-      
-      getCurrentUser() async {
-         FirebaseUser user = await FirebaseAuth.instance.currentUser();
-         
-    return user.uid;
+authorizeAccess(BuildContext context) {
+  Firestore.instance
+      .collection('/users')
+      .where('uid', isEqualTo: getCurrentUser().uid)
+      .getDocuments()
+      .then((docs) {
+    if (docs.documents[0].exists) {
+      if (docs.documents[0].data['role'] == 'admin') {
+        Navigator.of(context).push(new MaterialPageRoute(
+            builder: (BuildContext context) => new AdminHome()));
+      } else {
+        print('unAuthorized');
+      }
+    }
+  });
 }
 
+getCurrentUser() async {
+  FirebaseUser user = await FirebaseAuth.instance.currentUser();
+
+  return user.uid;
+}

@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:path/path.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EventsTile extends StatelessWidget {
   final String title, subtitle, description;
   final DateTime date;
   final String imageUrl;
+  final String phone;
+  
   final String lat;
   final String lng;
 
@@ -15,10 +19,25 @@ class EventsTile extends StatelessWidget {
       this.lat,
       this.lng,
       @required this.description,
-      @required this.imageUrl});
+      @required this.imageUrl, this.phone});
 
   @override
   Widget build(BuildContext context) {
+     void _launchDirectionUrl(String lat, String lng) async {
+    final url = 'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'could not launch $url';
+    }}
+      void _launchCalls(url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'could not launch $url';
+    }
+  
+  }
     return Card(
         child: Container(
           color: Colors.blue[100],
@@ -38,7 +57,7 @@ class EventsTile extends StatelessWidget {
          Row(
            mainAxisAlignment:MainAxisAlignment.spaceEvenly ,
           children: [
-             new IconButton(icon: Icon(Icons.phone), onPressed: () {}),
+             new IconButton(icon: Icon(Icons.phone), onPressed: () {_launchCalls(phone);}),
             
              InkWell(
                
@@ -52,7 +71,7 @@ class EventsTile extends StatelessWidget {
           ),
         ),
         
-        new IconButton(icon: Icon(Icons.directions), onPressed: () {}),
+        new IconButton(icon: Icon(Icons.directions), onPressed: () {_launchDirectionUrl(lat,lng);}),
           ],
         ),
        

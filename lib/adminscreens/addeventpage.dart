@@ -20,10 +20,10 @@ class _AddEventState extends State<AddEvent> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _latController = TextEditingController();
-  final TextEditingController _lngController = TextEditingController();
+  final TextEditingController _longController = TextEditingController();
   String get _title => _titleController.text;
-  double  _lat ;
- double _lng;
+  String get _lat => _latController.text;
+  String get _long => _longController.text;
 
   String get _phone => _phoneController.text;
 
@@ -53,7 +53,7 @@ class _AddEventState extends State<AddEvent> {
     _descriptionController.clear();
     _phoneController.clear();
     _latController.clear();
-    _lngController.clear();
+    _longController.clear();
   }
 
   void initState() {
@@ -274,7 +274,7 @@ class _AddEventState extends State<AddEvent> {
                               new BorderRadius.all(new Radius.circular(4.0))),
                       child: new TextFormField(
                         keyboardType: TextInputType.number,
-                        controller: _lngController,
+                        controller: _longController,
                         validator: (String _long) {
                           if (_long.isEmpty) {
                             return ("longitude required");
@@ -362,7 +362,7 @@ class _AddEventState extends State<AddEvent> {
                               if (!dateSelected) {
                                 return;
                               }
-                              _submit(_title, _subtitle,_phone,_lat,_lng, _description,
+                              _submit(_title, _subtitle,_phone,_lat,_long, _description,
                                   selectedDate);
                             },
                             icon: Icon(Icons.send),
@@ -375,7 +375,7 @@ class _AddEventState extends State<AddEvent> {
 
   void _submit(title, subtitle, phone, lat,long, description, selectedDate) async {
     if (_formkey.currentState.validate()) _formkey.currentState.save();
-    await DatabaseManager().createEvents(_title,_subtitle,_phone, _lat, _lng,
+    await DatabaseManager().createEvents(_title,_subtitle,_phone, _lat, _long,
         _description, selectedDate, image);
     Navigator.pop(this.context);
   }

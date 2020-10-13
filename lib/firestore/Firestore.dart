@@ -30,6 +30,20 @@ class DatabaseManager {
     });
   }
 
+  Future updateEventsList(
+      String title,String subtitle ,String phone, String description) async {
+    Firestore.instance
+        .collection('events')
+        .where('title', isEqualTo: title)
+        .getDocuments()
+        .then((querySnapshot) {
+      if (querySnapshot.documents[0].exists) {
+        querySnapshot.documents[0].reference.updateData(
+            {'title': title, 'subtitle': subtitle, 'phone': phone, 'description': description, });
+      }
+    });
+  }
+
   Future getEventsList() async {
     List itemsList = [];
     try {

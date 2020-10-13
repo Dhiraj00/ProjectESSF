@@ -4,6 +4,8 @@ import 'package:essf/adminscreens/addeventpage.dart';
 
 
 import 'package:essf/adminscreens/appusers.dart';
+import 'package:essf/adminscreens/editevents.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -82,6 +84,7 @@ class _AdminHomeState extends State<AdminHome> {
                     ),
                   ),
                 ),
+                
                 GestureDetector(
                   onTap: () {
                     Navigator.of(context).push(new CupertinoPageRoute(
@@ -109,6 +112,25 @@ class _AdminHomeState extends State<AdminHome> {
             new Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
+                 new GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(new CupertinoPageRoute(
+                        builder: (context) => EditEventsPage()));
+                  },
+                  child: new CircleAvatar(
+                    maxRadius: 70.0,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        new Icon(Icons.event),
+                        new SizedBox(
+                          height: 10.0,
+                        ),
+                        new Text("Events"),
+                      ],
+                    ),
+                  ),
+                ),
                 GestureDetector(
                   onTap: () {
                     FirebaseAuth.instance.signOut();
@@ -129,6 +151,7 @@ class _AdminHomeState extends State<AdminHome> {
                     ),
                   ),
                 ),
+                
               ],
             ),
             new SizedBox(

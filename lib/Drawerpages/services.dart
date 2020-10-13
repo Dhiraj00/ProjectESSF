@@ -1,5 +1,6 @@
 
 
+import 'package:essf/servicecategories/Alcoholanddrugs.dart';
 import 'package:essf/servicecategories/Disabilitysupport.dart';
 import 'package:essf/servicecategories/Education.dart';
 import 'package:essf/servicecategories/Housingandhomeless.dart';
@@ -21,7 +22,9 @@ class Services {
   static List<Services> serviceItems() {
     return <Services>[
       Services(
-        onPressed:(BuildContext context) =>print('hello'),
+        onPressed:(BuildContext context) =>Navigator.pushReplacement(
+      context, MaterialPageRoute(builder: (BuildContext context) =>AlcoholandDrugs(
+            ))),
         services: 'Alcohol and Drugs',
       ),
       Services(

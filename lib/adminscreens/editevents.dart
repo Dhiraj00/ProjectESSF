@@ -1,6 +1,5 @@
 import 'package:essf/events/eventslisttile.dart';
 import 'package:essf/firestore/Firestore.dart';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
